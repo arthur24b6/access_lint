@@ -18,6 +18,19 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.executables   = ['access_lint']
 
+  `git submodule --quiet foreach pwd`.split($\).each do |submodule_path|
+    Dir.chdir(submodule_path) do
+      submodule_files = `git ls-files`.split($\)
+      submodule_files_fullpaths = submodule_files.map do |filename|
+        "#{submodule_path}/#{filename}"
+      end
+      submodule_files_paths = submodule_files_fullpaths.map do |filename|
+        filename.gsub "#{File.dirname(__FILE__)}/", ""
+      end
+      spec.files += submodule_files_paths
+    end
+  end
+
   spec.add_dependency "thor"
 
   spec.add_development_dependency "bundler", "~> 1.3"
